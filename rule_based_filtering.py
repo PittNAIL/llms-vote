@@ -16,7 +16,7 @@ def main() -> None:
         if len(term) < 4 or 0.005 <= len(note_ids) / total:
             continue
         filtered_data[term] = note_ids
-    assert sum(map(len, filtered_data.values())) == 25_349
+    assert sum(map(len, filtered_data.values())) == 6_061
 
     with open("inverted_index_filtered.json", "w", encoding="utf-8") as file:
         json.dump(filtered_data, file, indent=4)

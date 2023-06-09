@@ -56,7 +56,7 @@ fn main() -> Result<(), anyhow::Error> {
     let mut mimic_data: Vec<(NoteID, NoteText)> = Vec::new();
     for result in csv_reader.into_deserialize() {
         let record: HashMap<String, String> = result?;
-        mimic_data.push((record["note_id"].to_lowercase(), record["text"].to_owned()))
+        mimic_data.push((record["note_id"].to_owned(), record["text"].to_owned()))
     }
     assert_eq!(mimic_data.len(), DISCHARGE_MIMIC_IV_COUNT);
     info!("Loading and parsing finished!");
@@ -68,7 +68,7 @@ fn main() -> Result<(), anyhow::Error> {
         .progress_count(len)
         .for_each(|entry| {
             for (note_id, text) in &mimic_data {
-                if text.contains(&entry.term) {
+                if text.contains(format!(" {} ", &entry.term.trim()).as_str()) {
                     (*entry).note_ids.insert(note_id.to_owned());
                 }
             }
