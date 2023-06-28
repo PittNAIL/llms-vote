@@ -170,4 +170,8 @@ tags
 # Persistent undo
 [._]*.un~
 
+# Ignore CSV and JSON
+*.csv
+*.json
+
 # End of https://www.toptal.com/developers/gitignore/api/linux,vim,pycharm,rust,rust-analyzer
