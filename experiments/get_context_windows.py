@@ -2,16 +2,25 @@ import json
 import pandas as pd
 from tqdm import tqdm
 import re
+import argparse
+import os
 
-with open("inverted_index_filtered.json") as file:
-    data = json.load(file)
-assert len(data) == 447
 
-df = pd.read_csv(
-    "clinical_notes_with_pos_labels.csv", usecols=["note_id", "text", "disease", "label"]
-)
+def parse_args() -> argparse.Namespace:
+    """Parses command line arguments."""
 
-pbar = tqdm(total=len(df), desc="Getting Window")
+    parser = argparse.ArgumentParser("Get Context Windows of 16, 32, and 64 words")
+
+    parser.add_argument("--data", type=str, help="path to input data", required=True)
+
+    return parser.parse_args()
+
+
+args = parse_args()
+
+df = pd.read_csv(args.data)
+
+window_sizes = [16, 32, 64]
 
 
 def context_window(text, disease, window_size):
@@ -34,11 +43,11 @@ def context_window(text, disease, window_size):
 
     if left_bound < 0:
         left_bound = 0
-        right_bound = 64
+        right_bound = window_size
 
     if right_bound > len(entry_tokens):
         right_bound = len(entry_tokens)
-        left_bound = len(entry_tokens) - 64
+        left_bound = len(entry_tokens) - window_size
 
     context = entry_tokens[left_bound:right_bound]
     context = " ".join(context)
@@ -54,17 +63,21 @@ def find_sub_list(sl, l):
             return ind, ind + sll - 1
 
 
-df["window"] = ""
-for index, row in df.iterrows():
-    text = row["text"]
-    disease = row["disease"]
-    window = context_window(text, disease, 64)
-    df.at[index, "window"] = window
-    pbar.update(1)
+for window_size in window_sizes:
+    pbar = tqdm(total=len(df), desc="Getting Window of Size %s" % window_size)
 
-pbar.close()
+    df["window"] = ""
+    for index, row in df.iterrows():
+        text = row["text"]
+        disease = row["disease"]
+        window = context_window(text, disease, window_size)
+        df.at[index, "window"] = window
+        pbar.update(1)
 
+    pbar.close()
 
-filtered_df = df[["note_id", "window", "disease", "label"]].copy()
+    output_directory = os.path.dirname(args.data)
 
-filtered_df.to_csv("pos_label_with_window.csv")
+    filtered_df = df[["note_id", "window", "disease", "label"]].copy()
+
+    filtered_df.to_csv(f"window_size_{window_size}.csv")
