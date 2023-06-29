@@ -13,6 +13,7 @@ import re
 
 np.set_printoptions(threshold=sys.maxsize)
 
+
 def parse_args() -> argparse.Namespace:
     """Parses command line arguments."""
 
@@ -22,20 +23,18 @@ def parse_args() -> argparse.Namespace:
 
     return parser.parse_args()
 
+
 args = parse_args()
 
 df = pd.read_csv(args.data)
 
-pbar = tqdm(total=len(df), desc="Encoding {dataset})
-
+pbar = tqdm(total=len(df), desc="Encoding {dataset}")
 
 
 # Load the BERT model and tokenizer
 model_name = "bionlp/bluebert_pubmed_uncased_L-24_H-1024_A-16"
 model = AutoModel.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-
-
 
 
 # Rest of the code (iterate over tuples and compute contextual mention representations)
@@ -77,11 +76,18 @@ for index, row in df.iterrows():
     mention_wordpiece_rep_in_context = vec[0][start_end_inds_tuple[0] : start_end_inds_tuple[1] + 1]
 
     # Compute the contextual mention representation within the entire context window
-    mention_rep_in_context = torch.mean(mention_wordpiece_rep_in_context, dim=0)
+    mention_rep_in_context = np.mean(mention_wordpiece_rep_in_context.numpy(), axis=0)
 
     # Append the contextual mention representation and label to the new_data list
-    new_data.append([mention_rep_in_context.numpy(), row["label"]])
+    new_data.append([mention_rep_in_context, row["label"]])
     pbar.update(1)
+
+
+# Convert the new_data list into a pandas DataFrame
+new_df = pd.DataFrame(new_data, columns=["mention_representation", "label"])
+
+mention_rep_array = np.vstack(new_df["mention_representation"])
+
 
 # Convert the new_data list into a pandas DataFrame
 new_df = pd.DataFrame(new_data, columns=["mention_representation", "label"])
@@ -90,10 +96,6 @@ mention_rep_array = np.vstack(new_df["mention_representation"].to_numpy())
 
 # Print the new DataFrame
 pbar.close()
-# new_df.to_csv('cw_ment_rep_32.csv')
-# print(new_df)
-
-
 
 
 def report_binary_class_dist(y):
