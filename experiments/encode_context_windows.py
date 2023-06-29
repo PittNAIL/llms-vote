@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import precision_score, recall_score, f1_score
 import re
-
+import argparse
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -27,6 +27,14 @@ def parse_args() -> argparse.Namespace:
 args = parse_args()
 
 df = pd.read_csv(args.data)
+
+
+# Get 100 of each class just for fast testing of a sample 200 entries.
+# df_label_1 = df[df['label'] == 1].head(100)
+# df_label_0 = df[df['label'] == 0].head(100)
+
+# df = pd.concat([df_label_1, df_label_0], ignore_index=True)
+
 
 pbar = tqdm(total=len(df), desc="Encoding {dataset}")
 
@@ -61,6 +69,11 @@ for index, row in df.iterrows():
 
     # Get the index of the start and end of the wordpiece of the mention in the tokenized context window
     start_end_inds_tuple = find_sub_list(mention_cue_tokenized, tokenized_context_window)
+
+    if start_end_inds_tuple is None:
+        # Mention tokens are not found in the context window
+        # Handle this case as per your requirements (e.g., skip or assign a default representation)
+        continue
 
     # Convert the tokenized context window to input tensors
     inputs = tokenizer(context_window, return_tensors="pt")
