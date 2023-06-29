@@ -1,15 +1,18 @@
+import argparse
+import re
+import sys
+
 import numpy as np
 import torch
-from transformers import AutoModel, AutoTokenizer
 import pandas as pd
 import tqdm
+
 from tqdm import tqdm
-import sys
-from sklearn.model_selection import train_test_split
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import precision_score, recall_score, f1_score
-import re
-import argparse
+from sklearn.model_selection import train_test_split
+from transformers import AutoModel, AutoTokenizer
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -122,12 +125,11 @@ def report_binary_class_dist(y):
     return data_class_report_str
 
 
-# 17684 neg, 6057 pos
 X = mention_rep_array
 y = new_df["label"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=1234)
 
-
+# set hyperparameter, this is the value set in Dr. Dong's codebase.
 C = 1
 
 

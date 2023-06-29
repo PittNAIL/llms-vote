@@ -1,9 +1,6 @@
-# Need context window function, find_sub_list
-# Don't need get_context_window_from_data_list_tuples..
-# Do we need context window function if we have dataset with that information?
-
-
 import random
+import pandas as pd
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
 
@@ -12,13 +9,8 @@ from torch import nn
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss
 from torch.nn import functional as F
 
-# from transformers import DistilBertTokenizerFast
-# from transformers import DistilBertForSequenceClassification
-
 from transformers import Trainer, TrainingArguments
-from transformers import AutoTokenizer, AutoModel  # , AutoModelForSequenceClassification
-
-import pandas as pd
+from transformers import AutoTokenizer, AutoModel
 
 
 def find_sub_list(sl, l):
@@ -136,24 +128,7 @@ class DatasetMentFiltGen(torch.utils.data.Dataset):
         self.list_offset_tuples = [
             offset_tuple if offset_tuple != None else (0, 0)
             for offset_tuple in self.list_offset_tuples
-        ]  # if mention tokens are not found in the context window tokens, set mention token offset as the first token, i.e. (0,0)
-        # #or remove the ones with no mention tokens found (i.e. None in self.list_offset_tuples), then do the tokenisation again get the _final encoding and offsets. - this can eliminates those in the testing data, so not recommended
-        # self.list_sent_cw_final = [self.list_sent_cw[ind] for ind, offset_tuple in enumerate(self.list_offset_tuples) if offset_tuple != None]
-        # self.list_doc_struc_final = [self.list_doc_struc[ind] for ind, offset_tuple in enumerate(self.list_offset_tuples) if offset_tuple != None]
-        # self.mention_final = [self.mention[ind] for ind, offset_tuple in enumerate(self.list_offset_tuples) if offset_tuple != None]
-        # self.labels_final = [self.labels[ind] for ind, offset_tuple in enumerate(self.list_offset_tuples) if offset_tuple != None]
-        # if use_doc_struc:
-        # self.encodings_final = tokenizer(self.list_doc_struc_final,self.list_sent_cw_final, truncation=True, padding=True)
-        # else:
-        # self.encodings_final = tokenizer(self.list_sent_cw_final, truncation=True, padding=True)
-        # #get the new mention offsets after the tokenisation
-        # mention_encodings_final = tokenizer(self.mention_final, add_special_tokens=False, truncation=True, padding=False)
-        # token_input_ids_cw_final = self.encodings_final['input_ids']
-        # token_input_ids_men_final = mention_encodings_final['input_ids']
-        # #print(token_input_ids_cw)
-        # self.list_offset_tuples_final = [find_sub_list(list_men_token_id,list_cw_token_id) for list_men_token_id,list_cw_token_id in zip(token_input_ids_men_final,token_input_ids_cw_final)]
-        # print(self.list_offset_tuples_final)
-        # print('%d out of %d retained after removing non-matched mention tokens' % (len(self.list_offset_tuples_final),len(self.list_offset_tuples)))
+        ]
 
     def __len__(self):
         "Denotes the total number of samples"
@@ -274,25 +249,6 @@ def compute_metrics(pred):
         "f1": f1,
     }
 
-
-# example code from https://huggingface.co/transformers/main_classes/trainer.html#trainer for multi-label classification
-# class MultilabelTrainer(Trainer):
-# def compute_loss(self, model, inputs, return_outputs=False):
-# print('self.model.config.num_labels:',self.model.config.num_labels)
-# labels = inputs.pop("labels")
-# outputs = model(**inputs)
-# print('outputs:',outputs)
-# logits = outputs.logits
-# print('logits:',logits.shape)
-# loss_fct = nn.BCEWithLogitsLoss()
-# print('logits.view(-1, self.model.config.num_labels):',logits.view(-1, self.model.config.num_labels).shape)
-# print('labels.float().view(-1, self.model.config.num_labels):',labels.float().view(-1, self.model.config.num_labels).shape)
-# '''logits.view(-1, self.model.config.num_labels): torch.Size([16, 2])
-# labels.float().view(-1, self.model.config.num_labels): torch.Size([8, 2])''' # this is due to the format of single label, which is not suitable to multilabel
-# loss = loss_fct(logits.view(-1, self.model.config.num_labels),
-# labels.float().view(-1, self.model.config.num_labels))
-# print('loss:',loss.shape)
-# return (loss, outputs) if return_outputs else loss
 
 if train_model:
     # using with the parameters in https://huggingface.co/transformers/custom_datasets.html#fine-tuning-with-trainer

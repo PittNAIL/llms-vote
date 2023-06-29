@@ -1,9 +1,11 @@
-import json
-import pandas as pd
-from tqdm import tqdm
-import re
 import argparse
+import json
 import os
+import re
+
+import pandas as pd
+
+from tqdm import tqdm
 
 
 def parse_args() -> argparse.Namespace:
@@ -24,6 +26,9 @@ window_sizes = [16, 32, 64]
 
 
 def context_window(text, disease, window_size):
+    """This function will return the context window for a disease mention in free text,
+    determined by variable "window_size"."""
+
     disease_tokens = disease.split()
     entry_tokens = text.split()
     entry_tokens_alphanum = [re.sub("[^A-Za-z0-9]+", "", token.lower()) for token in entry_tokens]
@@ -31,9 +36,9 @@ def context_window(text, disease, window_size):
     disease_tokens = [re.sub("[^A-Za-z0-9]+", "", token.lower()) for token in disease_tokens]
     list_positions = [find_sub_list(disease_tokens, entry_tokens_alphanum)[0]]
 
+    # Set bounds for the window.
     context_size = int(window_size / 2)
     list_idx = list_positions[0]
-    offset = len(disease_tokens)
 
     left_bound = 0
     right_bound = 0
