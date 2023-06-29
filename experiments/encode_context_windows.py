@@ -5,21 +5,29 @@ import pandas as pd
 import tqdm
 from tqdm import tqdm
 import sys
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import precision_score, recall_score, f1_score
+import re
+
 
 np.set_printoptions(threshold=sys.maxsize)
 
+def parse_args() -> argparse.Namespace:
+    """Parses command line arguments."""
 
-df = pd.read_csv("context_windows_with_labels_32.csv")
+    parser = argparse.ArgumentParser("Encode Context Windows and Get Model Performance")
 
-pbar = tqdm(total=len(df), desc="Getting Window")
+    parser.add_argument("--data", type=str, help="path to input data", required=True)
 
-# df_label_0 = df[df['label'] == 0]
-# df_label_1 = df[df['label'] == 1]
-# sample_size = 50
-# df_label_0_sample = df_label_0.sample(n=sample_size, random_state=1234)
-# df_label_1_sample = df_label_1.sample(n=sample_size, random_state=1234)
+    return parser.parse_args()
 
-# balanced_df = pd.concat([df_label_0_sample, df_label_1_sample])
+args = parse_args()
+
+df = pd.read_csv(args.data)
+
+pbar = tqdm(total=len(df), desc="Encoding {dataset})
+
 
 
 # Load the BERT model and tokenizer
@@ -28,16 +36,6 @@ model = AutoModel.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 
-# Convert the tokenized context window to input tensors
-# inputs = tokenizer(context_window, return_tensors="pt")
-# input_ids = inputs["input_ids"]
-# attention_mask = inputs["attention_mask"]
-
-
-# Generate the wordpiece representations using the BERT model
-# with torch.no_grad():
-#    outputs = model(input_ids, attention_mask=attention_mask)
-#    vec = outputs.last_hidden_state  # Shape: (batch_size, sequence_length, hidden_size)
 
 
 # Rest of the code (iterate over tuples and compute contextual mention representations)
@@ -64,11 +62,6 @@ for index, row in df.iterrows():
 
     # Get the index of the start and end of the wordpiece of the mention in the tokenized context window
     start_end_inds_tuple = find_sub_list(mention_cue_tokenized, tokenized_context_window)
-
-    if start_end_inds_tuple is None:
-        # Mention tokens are not found in the context window
-        # Handle this case as per your requirements (e.g., skip or assign a default representation)
-        continue
 
     # Convert the tokenized context window to input tensors
     inputs = tokenizer(context_window, return_tensors="pt")
@@ -101,14 +94,6 @@ pbar.close()
 # print(new_df)
 
 
-import pandas as pd
-import numpy as np
-
-
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import precision_score, recall_score, f1_score
-import re
 
 
 def report_binary_class_dist(y):
