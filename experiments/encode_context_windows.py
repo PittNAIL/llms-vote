@@ -33,17 +33,13 @@ df = pd.read_csv(args.data)
 
 
 # Get 100 of each class just for fast testing of a sample 200 entries.
-# df_label_1 = df[df['label'] == 1].head(100)
-# df_label_0 = df[df['label'] == 0].head(100)
-
-# df = pd.concat([df_label_1, df_label_0], ignore_index=True)
 
 
 pbar = tqdm(total=len(df), desc="Encoding {dataset}")
 
 
 # Load the BERT model and tokenizer
-model_name = "bionlp/bluebert_pubmed_uncased_L-24_H-1024_A-16"
+model_name = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
 model = AutoModel.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
@@ -75,7 +71,7 @@ for index, row in df.iterrows():
 
     if start_end_inds_tuple is None:
         # Mention tokens are not found in the context window
-        # Handle this case as per your requirements (e.g., skip or assign a default representation)
+        pbar.update(1)
         continue
 
     # Convert the tokenized context window to input tensors
@@ -90,6 +86,10 @@ for index, row in df.iterrows():
 
     # Get the wordpiece representations of the mention within the context window
     mention_wordpiece_rep_in_context = vec[0][start_end_inds_tuple[0] : start_end_inds_tuple[1] + 1]
+
+    nparray_mention_wordpiece_in_context = np.array(mention_wordpiece_rep_in_context)
+
+    nparray2d_mention_rep = np.mean(nparray_mention_wordpiece_in_context, axis=1)
 
     # Compute the contextual mention representation within the entire context window
     mention_rep_in_context = np.mean(mention_wordpiece_rep_in_context.numpy(), axis=0)

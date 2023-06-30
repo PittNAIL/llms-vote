@@ -22,11 +22,10 @@ def find_sub_list(sl, l):
 
 # 0. settings
 # for training and model related
-bert_model_name = "bert-models/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
+model_name = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
 per_device_train_batch_size = 16
 per_device_eval_batch_size = 64
 model_name_short = "blueBERTnorm"
-# bert_model_name="bionlp/bluebert_pubmed_mimic_uncased_L-24_H-1024_A-16";per_device_train_batch_size=4;per_device_eval_batch_size=4;model_name_short = 'blueBERTlarge'
 num_train_epochs = 3
 bert_frozen = False
 train_model = True
@@ -45,7 +44,7 @@ fill_data = True  # if True, fill the prediction into the .xlsx file
 # 1. load data, encoding, and train model
 # load data
 
-df = pd.read_csv("context_windows_with_labels_32.csv")
+df = pd.read_csv("window_size_16.csv")
 
 num_sample_tr = len(df)  # 9000 #len(data_list_tuples) #500 #len(data_list_tuples) #1000
 num_sample_eval = 2000
@@ -72,8 +71,6 @@ class DatasetMentFiltGen(torch.utils.data.Dataset):
         self.list_sent_cw = [
             data_tuple_cw[0] for data_tuple_cw in data_list_tuples_cw if data_tuple_cw[0] != ""
         ]
-        # self.list_offset_start = [data_tuple_cw[1] for data_tuple_cw in data_list_tuples_cw if data_tuple_cw[0] != '' ]
-        # self.list_offset_end = [data_tuple_cw[2] for data_tuple_cw in data_list_tuples_cw if data_tuple_cw[0] != '' ]
         self.list_doc_struc = [
             data_tuple_cw[3] for data_tuple_cw in data_list_tuples_cw if data_tuple_cw[0] != ""
         ]
@@ -186,11 +183,7 @@ class mentionBERT(nn.Module):
             outputs.hidden_states
         )  # a tuple of k+1 layers (k=12 for bert-base) and each is a shape of (batch_size,sent_token_len,hidden_note_size)
         second_to_last_layer_hs = hidden_states[-2]
-        # print('second_to_last_layer_hs',second_to_last_layer_hs)
 
-        # logits = self.classifier(second_to_last_layer_hs[:,0,:].view(-1,768)) ## extract the 1st token's embeddings
-
-        # print('begin_offsets, end_offsets', begin_offsets, end_offsets)
         sequence_output_cont_emb = [
             torch.mean(second_to_last_layer_hs[ind][offset_start : offset_end + 1], dim=0)
             for ind, (offset_start, offset_end) in enumerate(zip(begin_offsets, end_offsets))
@@ -203,12 +196,10 @@ class mentionBERT(nn.Module):
         pooled_output = self.activation(pooled_output)
 
         logits = self.classifier(pooled_output)
-        # logits = self.classifier(sequence_output_cont_emb)
 
         loss_fct = CrossEntropyLoss()
-        # loss_fct = BCEWithLogitsLoss()
+
         loss = loss_fct(logits.view(-1, self.bert.config.num_labels), labels.view(-1))
-        # loss = loss_fct(logits.view(-1), labels.view(-1).float())
 
         output = (logits,) + outputs[2:]
         return (loss,) + output
