@@ -10,11 +10,10 @@
 #
 import argparse
 import logging
+import pathlib
 
 import rdflib
 import tqdm
-
-from pathlib import Path
 
 
 QUERY: str = """
@@ -44,7 +43,7 @@ def main() -> None:
     args = parse_args()
 
     logger = logging.getLogger(__name__)
-    logging.basicConfig(filename=f"{Path(__file__).stem}.log", level=logging.INFO)
+    logging.basicConfig(filename=f"{pathlib.Path(__file__).stem}.log", level=logging.INFO)
 
     logger.info("Loading and parsing ORDO ontology...")
     g = rdflib.Graph()
