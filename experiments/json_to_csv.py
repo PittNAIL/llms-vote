@@ -1,6 +1,6 @@
 import argparse
 import json
-import os
+import pathlib
 
 import pandas as pd
 
@@ -16,18 +16,19 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def load_json_files(json_dir: str) -> dict:
+def load_json_files(dir: str) -> tuple[dict, dict]:
     """Loads and merges JSON files from a directory."""
+
     data_pos = {}
     data_neg = {}
-    for filename in os.listdir(json_dir):
-        if filename.endswith(".json"):
-            with open(os.path.join(json_dir, filename), encoding="utf-8") as f:
-                json_data = json.load(f)
-                if "positive" in filename:
-                    data_pos.update(json_data)
-                elif "negative" in filename:
-                    data_neg.update(json_data)
+    for path in pathlib.Path(dir).glob("*.json"):
+        with open(path, encoding="utf-8") as file:
+            data = json.load(file)
+            if "positive" in path:
+                data_pos.update(data)
+            else:
+                data_neg.update(data)
+
     return data_pos, data_neg
 
 
