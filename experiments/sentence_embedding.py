@@ -39,8 +39,7 @@ def main() -> None:
             emb.append(sentence_embedding)
             lbl.append(row["label"])
 
-    # emb = np.array(emb)
-    # lbl = np.array(lbl)
+    emb = np.array([tensor.numpy() for tensor in emb])
 
     emb_train, emb_test, lbl_train, lbl_test = train_test_split(
         emb, lbl, test_size=0.1, random_state=1337
@@ -59,15 +58,15 @@ def main() -> None:
 
     print("Macro Metrics")
     print("================")
-    print(f"{precision_macro=.2f}")
-    print(f"{recall_macro=.2f}")
-    print(f"{fscore_macro=.2f}")
+    print(f"precision_macro={precision_macro:.2f}")
+    print(f"recall_macro={recall_macro:.2f}")
+    print(f"fscore_macro={fscore_macro:.2f}")
 
     print("\nWeighted Metrics")
     print("================")
-    print(f"{precision_weighted=.2f}")
-    print(f"{recall_weighted=.2f}")
-    print(f"{fscore_weighted=.2f}")
+    print(f"precision_weighted={precision_weighted:.2f}")
+    print(f"recall_weighted={recall_weighted:.2f}")
+    print(f"fscore_weighted={fscore_weighted:.2f}")
 
 
 if __name__ == "__main__":
