@@ -1,3 +1,4 @@
+import argparse
 import torch
 import tqdm
 
@@ -14,15 +15,26 @@ from transformers import AutoModel, AutoTokenizer
 MODEL_NAME: str = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
 
 
+def parse_args() -> argparse.Namespace():
+    """Parse command line arguments."""
+
+    parser = argparse.ArgumentParser("Generate Sentence Embeddings of Context Windows")
+    parser.add_argument("--data", type=str, help="path to input data", required=True)
+
+    return parser.parse_args()
+
+
 def main() -> None:
     """Generates sentence embbeddings."""
+
+    args = parse_args()
 
     # Load the BERT model and tokenizer
     model = AutoModel.from_pretrained(MODEL_NAME)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     # Tokenize the sentence and mention (or 16, 32)
-    df = pd.read_csv("window_size_64.csv")
+    df = pd.read_csv(args.data)
 
     emb = []
     lbl = []

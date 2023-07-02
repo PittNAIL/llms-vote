@@ -1,5 +1,4 @@
 import argparse
-import json
 import os
 import re
 import tqdm
@@ -58,6 +57,7 @@ def context_window(text, disease, window_size):
 
 
 def main() -> None:
+    """Obtain context windows of rare disease mentions in clinical notes."""
     args = parse_args()
 
     df = pd.read_csv(args.data)

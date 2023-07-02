@@ -38,6 +38,8 @@ def load_json_files(dir: str) -> tuple[dict, dict]:
 
 
 def main() -> None:
+    """Returns subset of MIMIC-IV dataset from inverted indices."""
+
     args = parse_args()
 
     logger = logging.getLogger(__name__)
