@@ -33,7 +33,6 @@ def main() -> None:
     model = AutoModel.from_pretrained(MODEL_NAME)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
-    # Tokenize the sentence and mention (or 16, 32)
     df = pd.read_csv(args.data)
 
     emb = []
