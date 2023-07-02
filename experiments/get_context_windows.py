@@ -2,10 +2,11 @@ import argparse
 import json
 import os
 import re
+import tqdm
 
 import pandas as pd
 
-from tqdm import tqdm
+from util import find_sub_list
 
 
 def parse_args() -> argparse.Namespace:
@@ -14,15 +15,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser("Get Context Windows of 16, 32, and 64 words")
 
     parser.add_argument("--data", type=str, help="path to input data", required=True)
+    parser.add_argument(
+        "--sizes", type=int, help="Window sizes to obtain", nargs="*", required=True
+    )
 
     return parser.parse_args()
-
-
-args = parse_args()
-
-df = pd.read_csv(args.data)
-
-window_sizes = [16, 32, 64]
 
 
 def context_window(text, disease, window_size):
@@ -37,7 +34,7 @@ def context_window(text, disease, window_size):
     list_positions = [find_sub_list(disease_tokens, entry_tokens_alphanum)[0]]
 
     # Set bounds for the window.
-    context_size = int(window_size / 2)
+    context_size = int(int(window_size) / 2)
     list_idx = list_positions[0]
 
     left_bound = 0
@@ -60,29 +57,25 @@ def context_window(text, disease, window_size):
     return context
 
 
-def find_sub_list(sl, l):
-    #'''find the first occurrence of a sublist in list: #from https://stackoverflow.com/a/17870684'''
-    sll = len(sl)
-    for ind in (i for i, e in enumerate(l) if e == sl[0]):
-        if l[ind : ind + sll] == sl:
-            return ind, ind + sll - 1
+def main() -> None:
+    args = parse_args()
+
+    df = pd.read_csv(args.data)
+
+    window_sizes = args.sizes
+
+    for window_size in window_sizes:
+        df["window"] = ""
+        for index, row in tqdm.tqdm(df.iterrows(), desc=f"Getting Window of Size {window_size}"):
+            window = context_window(row["text"], row["disease"], window_size)
+            df.at[index, "window"] = window
+
+        output_directory = os.path.dirname(args.data)
+
+        filtered_df = df[["note_id", "window", "disease", "label"]].copy()
+
+        filtered_df.to_csv(f"window_size_{window_size}.csv")
 
 
-for window_size in window_sizes:
-    pbar = tqdm(total=len(df), desc="Getting Window of Size %s" % window_size)
-
-    df["window"] = ""
-    for index, row in df.iterrows():
-        text = row["text"]
-        disease = row["disease"]
-        window = context_window(text, disease, window_size)
-        df.at[index, "window"] = window
-        pbar.update(1)
-
-    pbar.close()
-
-    output_directory = os.path.dirname(args.data)
-
-    filtered_df = df[["note_id", "window", "disease", "label"]].copy()
-
-    filtered_df.to_csv(f"window_size_{window_size}.csv")
+if __name__ == "__main__":
+    main()
