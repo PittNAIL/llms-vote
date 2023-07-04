@@ -34,6 +34,9 @@ def main() -> None:
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     df = pd.read_csv(args.data)
+    #    df_1 = df[df["label"] == 1].head(100)
+    #    df_0 = df[df["label"] == 0].head(100)
+    #    df = pd.concat([df_1, df_0])
 
     emb = []
     lbl = []
@@ -66,6 +69,9 @@ def main() -> None:
     precision_weighted, recall_weighted, fscore_weighted, _ = precision_recall_fscore_support(
         pred, lbl_test, average="weighted"
     )
+
+    np.save(f"embedding_{args.data}.npy", emb)
+    np.save(f"labels_{args.data}.npy", np.array(lbl))
 
     print("Macro Metrics")
     print("================")
