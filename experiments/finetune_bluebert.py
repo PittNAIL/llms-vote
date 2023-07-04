@@ -1,8 +1,8 @@
 import argparse
+import datasets
 import numpy as np
 import pandas as pd
 
-import datasets
 from datasets import Dataset
 
 from sklearn.metrics import precision_recall_fscore_support
