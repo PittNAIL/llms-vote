@@ -1,5 +1,4 @@
 import argparse
-import os
 import re
 import tqdm
 
@@ -33,11 +32,8 @@ def context_window(text, disease, window_size):
     list_positions = [find_sub_list(disease_tokens, entry_tokens_alphanum)[0]]
 
     # Set bounds for the window.
-    context_size = int(int(window_size) / 2)
+    context_size = window_size // 2 
     list_idx = list_positions[0]
-
-    left_bound = 0
-    right_bound = 0
 
     left_bound = list_idx - context_size
     right_bound = list_idx + context_size
@@ -65,15 +61,14 @@ def main() -> None:
     window_sizes = args.sizes
 
     for window_size in window_sizes:
-        df["window"] = ""
+        window_list = []
         for index, row in tqdm.tqdm(df.iterrows(), desc=f"Getting Window of Size {window_size}"):
             window = context_window(row["text"], row["disease"], window_size)
-            df.at[index, "window"] = window
-
-        output_directory = os.path.dirname(args.data)
+            window_list.append(window)
 
         filtered_df = df[["note_id", "window", "disease", "label"]].copy()
 
+        filtered_df["window"] = window_list
         filtered_df.to_csv(f"window_size_{window_size}.csv")
 
 
