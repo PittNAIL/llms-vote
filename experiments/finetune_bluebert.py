@@ -18,6 +18,8 @@ from transformers import AutoModel
 MODEL_NAME = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
+#TO DO: ADD DETERMINATION OF FINETUNING DESTINATION FROM CMD LINE INPUT
+
 
 def parse_args() -> argparse.Namespace:
     """Parses command line arguments."""
