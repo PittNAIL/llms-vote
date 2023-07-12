@@ -4,6 +4,8 @@ import tqdm
 
 import pandas as pd
 
+from pathlib import Path
+
 from util import find_sub_list
 
 
@@ -62,15 +64,17 @@ def main() -> None:
 
     for window_size in window_sizes:
         window_list = []
-        for index, row in tqdm.tqdm(df.iterrows(), desc=f"Getting Window of Size {window_size}"):
+        for _, row in tqdm.tqdm(df.iterrows(), desc=f"Getting Window of Size {window_size}"):
             window = context_window(row["text"], row["disease"], window_size)
             window_list.append(window)
 
-        filtered_df = df[["note_id", "window", "disease", "label"]].copy()
+        output_dir = Path(args.data).parent
+        output_file = output_dir / f"window_size_{window_size}.csv"
 
+        filtered_df = df[["note_id", "disease", "label"]].copy()
         filtered_df["window"] = window_list
-        filtered_df.to_csv(f"window_size_{window_size}.csv")
 
+        filtered_df.to_csv(output_file, index=False)
 
 if __name__ == "__main__":
     main()

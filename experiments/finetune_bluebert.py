@@ -2,6 +2,9 @@ import argparse
 import datasets
 import numpy as np
 import pandas as pd
+import torch
+
+from torch import nn
 
 from datasets import Dataset
 
@@ -10,6 +13,7 @@ from sklearn.model_selection import train_test_split
 
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from transformers import Trainer, TrainingArguments
+from transformers import AutoModel
 
 MODEL_NAME = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -30,7 +34,36 @@ def tokenize_function(examples):
     return tokenizer(examples["window"], padding="max_length", truncation=True, max_length=128)
 
 
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
+#model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
+class mentionBERT(nn.Module):
+    def __init__(self, bert_model_name):
+        super(mentionBERT, self).__init__()
+        self.bert = AutoModel.from_pretrained(bert_model_name)
+        self.dense = nn.Linear(self.bert.config.hidden_size, self.bert.config.hidden_size)
+        self.activation = nn.Tanh()
+        self.classifier = nn.Linear(self.bert.config.hidden_size, self.bert.config.num_labels)
+
+
+    def forward(self, input_ids=None, attention_mask=None, begin_offsets=None, end_offsets=None, labels=None):
+        outputs = self.bert(
+            input_ids,
+            attention_mask=attention_mask,
+            output_hidden_states=True
+        )
+
+        hidden_states = outputs.hidden_states
+        second_to_last_layer_hs = hidden_states[-2]
+
+        averaged_representations = torch.mean(second_to_last_layer_hs, dim=1)
+        pooled_output = self.dense(averaged_representations)
+        pooled_output = self.activation(pooled_output)
+
+        logits = self.classifier(pooled_output)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(logits.view(-1, self.bert.config.num_labels), labels.view(-1))
+
+        return loss, logits
 
 
 training_args = TrainingArguments(
@@ -44,7 +77,7 @@ training_args = TrainingArguments(
     weight_decay=0.01,
     warmup_steps=500,
     eval_accumulation_steps=1,
-    output_dir="fine-tune-output",
+    output_dir="fine-tune-64"
 )
 
 
@@ -67,16 +100,20 @@ def main() -> None:
     train_dataset = Dataset.from_dict(df_train)
     test_dataset = Dataset.from_dict(df_test)
     dataset = datasets.DatasetDict({"train": train_dataset, "test": test_dataset})
-
+    
     tokenized_datasets = dataset.map(tokenize_function, batched=True)
-    train_dataset = tokenized_datasets["train"]
-    eval_dataset = tokenized_datasets["test"]
+   # train_dataset = tokenized_datasets["train"]
+   # eval_dataset = tokenized_datasets["test"]
+    small_train_dataset = tokenized_datasets["train"].shuffle(seed=1234).select(range(1000))
+    small_eval_dataset = tokenized_datasets["test"].shuffle(seed=1234).select(range(1000))
+    
+    model = mentionBERT(MODEL_NAME)
 
     trainer = Trainer(
         model=model,
         args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
+        train_dataset=small_train_dataset,
+        eval_dataset=small_eval_dataset,
         compute_metrics=compute_metrics,
     )
 

@@ -13,7 +13,7 @@ from transformers import AutoModel, AutoTokenizer
 
 
 MODEL_NAME: str = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
-
+FINE_TUNED_MODEL_PATH: str = "/home/jordan/Documents/fsl-for-rare-disease/experiments/fine-tune-32/checkpoint-189"
 
 def parse_args() -> argparse.Namespace():
     """Parse command line arguments."""
@@ -30,7 +30,7 @@ def main() -> None:
     args = parse_args()
 
     # Load the BERT model and tokenizer
-    model = AutoModel.from_pretrained(MODEL_NAME)
+    model = AutoModel.from_pretrained(FINE_TUNED_MODEL_PATH)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     df = pd.read_csv(args.data)
