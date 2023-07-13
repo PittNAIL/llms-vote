@@ -1,4 +1,6 @@
 import argparse
+import os
+import shutil
 import torch
 import tqdm
 
@@ -13,31 +15,42 @@ from transformers import AutoModel, AutoTokenizer
 
 
 MODEL_NAME: str = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
-FINE_TUNED_MODEL_PATH: str = "/home/jordan/Documents/fsl-for-rare-disease/experiments/fine-tune-8/checkpoint-189"
+experiments_dir = os.path.abspath(os.path.dirname(__file__))
+CONFIG_FILE_PATH = os.path.join(experiments_dir, "config.json")
+
 
 def parse_args() -> argparse.Namespace():
     """Parse command line arguments."""
 
     parser = argparse.ArgumentParser("Generate Sentence Embeddings of Context Windows")
     parser.add_argument("--data", type=str, help="path to input data", required=True)
+    parser.add_argument("--finetuned", action="store_true", default=False, help="Flag for using a finetuned model")
 
     return parser.parse_args()
 
 
 def main() -> None:
     """Generates sentence embbeddings."""
-
     args = parse_args()
 
-    # Load the BERT model and tokenizer
-    model = AutoModel.from_pretrained(FINE_TUNED_MODEL_PATH)
-   # model = AutoModel.from_pretrained(MODEL_NAME)
+    data_file = args.data
+    finetune_flag = args.finetuned
+    if finetune_flag:
+        if data_file == "window_size_8.csv":
+            model_path = "fine-tune-8/checkpoint-189"
+        elif data_file == "window_size_16.csv":
+            model_path = "fine-tune-16/checkpoint-189"
+        elif data_file == "window_size_32.csv":
+            model_path = "fine-tune-32/checkpoint-189"
+        else:
+            raise ValueError("Unsupported data file for finetuning!")
+        model_dir = os.path.join(experiments_dir, model_path)
+        shutil.copy(CONFIG_FILE_PATH, model_dir)
+        model = AutoModel.from_pretrained(model_dir)
+    else:
+        model = AutoModel.from_pretrained(MODEL_NAME)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-
-    df = pd.read_csv(args.data)
-    #    df_1 = df[df["label"] == 1].head(100)
-    #    df_0 = df[df["label"] == 0].head(100)
-    #    df = pd.concat([df_1, df_0])
+    df = pd.read_csv(data_file)
 
     emb = []
     lbl = []
@@ -70,9 +83,6 @@ def main() -> None:
     precision_weighted, recall_weighted, fscore_weighted, _ = precision_recall_fscore_support(
         pred, lbl_test, average="weighted"
     )
-
-    np.save(f"embedding_{args.data}.npy", emb)
-    np.save(f"labels_{args.data}.npy", np.array(lbl))
 
     print("Macro Metrics")
     print("================")
