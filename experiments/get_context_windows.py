@@ -34,7 +34,7 @@ def context_window(text, disease, window_size):
     list_positions = [find_sub_list(disease_tokens, entry_tokens_alphanum)[0]]
 
     # Set bounds for the window.
-    context_size = window_size // 2 
+    context_size = window_size // 2
     list_idx = list_positions[0]
 
     left_bound = list_idx - context_size
@@ -75,6 +75,7 @@ def main() -> None:
         filtered_df["window"] = window_list
 
         filtered_df.to_csv(output_file, index=False)
+
 
 if __name__ == "__main__":
     main()

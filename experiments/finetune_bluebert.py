@@ -18,7 +18,7 @@ from transformers import AutoModel
 MODEL_NAME = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
-#TO DO: ADD DETERMINATION OF FINETUNING DESTINATION FROM CMD LINE INPUT
+# TO DO: ADD DETERMINATION OF FINETUNING DESTINATION FROM CMD LINE INPUT
 
 
 def parse_args() -> argparse.Namespace:
@@ -36,7 +36,7 @@ def tokenize_function(examples):
     return tokenizer(examples["window"], padding="max_length", truncation=True, max_length=128)
 
 
-#model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
+# model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
 class mentionBERT(nn.Module):
     def __init__(self, bert_model_name):
         super(mentionBERT, self).__init__()
@@ -45,13 +45,10 @@ class mentionBERT(nn.Module):
         self.activation = nn.Tanh()
         self.classifier = nn.Linear(self.bert.config.hidden_size, self.bert.config.num_labels)
 
-
-    def forward(self, input_ids=None, attention_mask=None, begin_offsets=None, end_offsets=None, labels=None):
-        outputs = self.bert(
-            input_ids,
-            attention_mask=attention_mask,
-            output_hidden_states=True
-        )
+    def forward(
+        self, input_ids=None, attention_mask=None, begin_offsets=None, end_offsets=None, labels=None
+    ):
+        outputs = self.bert(input_ids, attention_mask=attention_mask, output_hidden_states=True)
 
         hidden_states = outputs.hidden_states
         second_to_last_layer_hs = hidden_states[-2]
@@ -79,7 +76,7 @@ training_args = TrainingArguments(
     weight_decay=0.01,
     warmup_steps=500,
     eval_accumulation_steps=1,
-    output_dir="fine-tune-8"
+    output_dir="fine-tune-8",
 )
 
 
@@ -102,13 +99,13 @@ def main() -> None:
     train_dataset = Dataset.from_dict(df_train)
     test_dataset = Dataset.from_dict(df_test)
     dataset = datasets.DatasetDict({"train": train_dataset, "test": test_dataset})
-    
+
     tokenized_datasets = dataset.map(tokenize_function, batched=True)
-   # train_dataset = tokenized_datasets["train"]
-   # eval_dataset = tokenized_datasets["test"]
+    # train_dataset = tokenized_datasets["train"]
+    # eval_dataset = tokenized_datasets["test"]
     small_train_dataset = tokenized_datasets["train"].shuffle(seed=1234).select(range(1000))
     small_eval_dataset = tokenized_datasets["test"].shuffle(seed=1234).select(range(1000))
-    
+
     model = mentionBERT(MODEL_NAME)
 
     trainer = Trainer(

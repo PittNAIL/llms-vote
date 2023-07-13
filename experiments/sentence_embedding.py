@@ -19,14 +19,29 @@ experiments_dir = os.path.abspath(os.path.dirname(__file__))
 CONFIG_FILE_PATH = os.path.join(experiments_dir, "config.json")
 
 
-def parse_args() -> argparse.Namespace():
+def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
 
     parser = argparse.ArgumentParser("Generate Sentence Embeddings of Context Windows")
     parser.add_argument("--data", type=str, help="path to input data", required=True)
-    parser.add_argument("--finetuned", action="store_true", default=False, help="Flag for using a finetuned model")
+    parser.add_argument(
+        "--finetuned", action="store_true", default=False, help="Flag for using a finetuned model"
+    )
 
     return parser.parse_args()
+
+
+def get_model_path(data_file: str) -> str:
+    """Get model path from args.data input"""
+    if data_file == "window_size_8.csv":
+        path = "fine-tune-8/checkpoint-189"
+    elif data_file == "window_size_16.csv":
+        path = "fine-tune-16/checkpoint-189"
+    elif data_file == "window_size_32.csv":
+        path = "fine-tune-32/checkpoint-189"
+    else:
+        raise ValueError("Unsupported data file for finetuning!")
+    return path
 
 
 def main() -> None:
@@ -36,14 +51,7 @@ def main() -> None:
     data_file = args.data
     finetune_flag = args.finetuned
     if finetune_flag:
-        if data_file == "window_size_8.csv":
-            model_path = "fine-tune-8/checkpoint-189"
-        elif data_file == "window_size_16.csv":
-            model_path = "fine-tune-16/checkpoint-189"
-        elif data_file == "window_size_32.csv":
-            model_path = "fine-tune-32/checkpoint-189"
-        else:
-            raise ValueError("Unsupported data file for finetuning!")
+        model_path = get_model_path(data_file)
         model_dir = os.path.join(experiments_dir, model_path)
         shutil.copy(CONFIG_FILE_PATH, model_dir)
         model = AutoModel.from_pretrained(model_dir)
@@ -51,17 +59,17 @@ def main() -> None:
         model = AutoModel.from_pretrained(MODEL_NAME)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     df = pd.read_csv(data_file)
+    print(model_dir)
 
     emb = []
     lbl = []
     with torch.no_grad():
         for _, row in tqdm.tqdm(df.iterrows(), desc="Encoding dataset"):
-            # This will encode the entire "sentence", being the full context window of 16,32,64
+            # Encode each context window of size 8,16,32
             # words, and return its vector representation.
             inputs = tokenizer(row["window"], return_tensors="pt")
 
             outputs = model(**inputs)
-            # NOTE: sentence embedding is averaged in line with what Dr. Dong does.
             sentence_embedding = torch.mean(outputs.last_hidden_state, dim=1).squeeze(0)
 
             emb.append(sentence_embedding)
