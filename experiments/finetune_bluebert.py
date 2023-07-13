@@ -79,7 +79,7 @@ training_args = TrainingArguments(
     weight_decay=0.01,
     warmup_steps=500,
     eval_accumulation_steps=1,
-    output_dir="fine-tune-64"
+    output_dir="fine-tune-8"
 )
 
 
