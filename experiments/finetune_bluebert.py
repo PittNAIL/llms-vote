@@ -26,9 +26,7 @@ def parse_args() -> argparse.Namespace:
 
     parser = argparse.ArgumentParser("csv file for finetuning BlueBERT")
 
-    parser.add_argument(
-        "--data", type=str, help="path to dataset", required=True
-    )  # E: line too long (86 > 79 characters)
+    parser.add_argument("--data", type=str, help="path to dataset", required=True)
     return parser.parse_args()
 
 
@@ -36,7 +34,6 @@ def tokenize_function(examples):
     return tokenizer(examples["window"], padding="max_length", truncation=True, max_length=128)
 
 
-# model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=2)
 class mentionBERT(nn.Module):
     def __init__(self, bert_model_name):
         super(mentionBERT, self).__init__()
@@ -101,8 +98,6 @@ def main() -> None:
     dataset = datasets.DatasetDict({"train": train_dataset, "test": test_dataset})
 
     tokenized_datasets = dataset.map(tokenize_function, batched=True)
-    # train_dataset = tokenized_datasets["train"]
-    # eval_dataset = tokenized_datasets["test"]
     small_train_dataset = tokenized_datasets["train"].shuffle(seed=1234).select(range(1000))
     small_eval_dataset = tokenized_datasets["test"].shuffle(seed=1234).select(range(1000))
 
