@@ -11,14 +11,14 @@ from datasets import Dataset
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
 
-from transformers import AutoModelForSequenceClassification, AutoTokenizer
+from transformers import AutoModel, AutoTokenizer
 from transformers import Trainer, TrainingArguments
-from transformers import AutoModel
+from transformers import set_seed
+
+set_seed(1234)
 
 MODEL_NAME = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-
-# TO DO: ADD DETERMINATION OF FINETUNING DESTINATION FROM CMD LINE INPUT
 
 
 def parse_args() -> argparse.Namespace:
@@ -42,9 +42,7 @@ class mentionBERT(nn.Module):
         self.activation = nn.Tanh()
         self.classifier = nn.Linear(self.bert.config.hidden_size, self.bert.config.num_labels)
 
-    def forward(
-        self, input_ids=None, attention_mask=None, begin_offsets=None, end_offsets=None, labels=None
-    ):
+    def forward(self, input_ids=None, attention_mask=None, labels=None):
         outputs = self.bert(input_ids, attention_mask=attention_mask, output_hidden_states=True)
 
         hidden_states = outputs.hidden_states
@@ -77,6 +75,23 @@ training_args = TrainingArguments(
 )
 
 
+def set_dir(data_file):
+    """Get model path from args.data input"""
+    if data_file == "window_size_4.csv":
+        path = "fine-tune-4"
+    elif data_file == "window_size_8.csv":
+        path = "fine-tune-8"
+    elif data_file == "window_size_16.csv":
+        path = "fine-tune-16"
+    elif data_file == "window_size_32.csv":
+        path = "fine-tune-32"
+    elif data_file == "window_size_64.csv":
+        path = "fine-tune-32"
+    else:
+        raise ValueError("Unsupported data file for finetuning!")
+    return path
+
+
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
     predictions = np.argmax(logits, axis=-1)
@@ -92,7 +107,8 @@ def main() -> None:
     args = parse_args()
     df = pd.read_csv(args.data)
     df_train, df_test = train_test_split(df, test_size=0.1, random_state=1234)
-
+    training_args.output_dir = set_dir(args.data)
+    print(training_args.output_dir)
     train_dataset = Dataset.from_dict(df_train)
     test_dataset = Dataset.from_dict(df_test)
     dataset = datasets.DatasetDict({"train": train_dataset, "test": test_dataset})
