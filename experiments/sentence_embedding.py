@@ -12,7 +12,9 @@ from sklearn.metrics import precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
 
 from transformers import AutoModel, AutoTokenizer
+from transformers import set_seed
 
+set_seed(1234)
 
 MODEL_NAME: str = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
 experiments_dir = os.path.abspath(os.path.dirname(__file__))
@@ -33,12 +35,8 @@ def parse_args() -> argparse.Namespace:
 
 def get_model_path(data_file: str) -> str:
     """Get model path from args.data input"""
-    if data_file == "window_size_8.csv":
-        path = "fine-tune-8/checkpoint-189"
-    elif data_file == "window_size_16.csv":
-        path = "fine-tune-16/checkpoint-189"
-    elif data_file == "window_size_32.csv":
-        path = "fine-tune-32/checkpoint-189"
+    if "window_size_" in data_file:
+        path = f"fine-tune-{data_file.split('_')[2].split('.')[0]}/checkpoint-189"
     else:
         raise ValueError("Unsupported data file for finetuning!")
     return path
@@ -59,7 +57,6 @@ def main() -> None:
         model = AutoModel.from_pretrained(MODEL_NAME)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     df = pd.read_csv(data_file)
-    print(model_dir)
 
     emb = []
     lbl = []
@@ -78,7 +75,7 @@ def main() -> None:
     emb = np.array([tensor.numpy() for tensor in emb])
 
     emb_train, emb_test, lbl_train, lbl_test = train_test_split(
-        emb, lbl, test_size=0.1, random_state=1337
+        emb, lbl, test_size=0.1, random_state=1234
     )
 
     clf = LogisticRegression(max_iter=1_000)

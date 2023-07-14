@@ -1,10 +1,11 @@
 import argparse
 import re
-import tqdm
 
 import pandas as pd
 
 from pathlib import Path
+
+import tqdm
 
 from util import find_sub_list
 
@@ -36,20 +37,24 @@ def context_window(text, disease, window_size):
     # Set bounds for the window.
     context_size = window_size // 2
     list_idx = list_positions[0]
+    if window_size == len(disease_tokens):
+        context = disease
+    elif window_size == len(disease_tokens) + 1:
+        context = entry_tokens[list_idx - 1] + " " + disease
+    else:
+        left_bound = list_idx - context_size
+        right_bound = list_idx + context_size
 
-    left_bound = list_idx - context_size
-    right_bound = list_idx + context_size
+        if left_bound < 0:
+            left_bound = 0
+            right_bound = window_size
 
-    if left_bound < 0:
-        left_bound = 0
-        right_bound = window_size
+        if right_bound > len(entry_tokens):
+            right_bound = len(entry_tokens)
+            left_bound = len(entry_tokens) - window_size
 
-    if right_bound > len(entry_tokens):
-        right_bound = len(entry_tokens)
-        left_bound = len(entry_tokens) - window_size
-
-    context = entry_tokens[left_bound:right_bound]
-    context = " ".join(context)
+        context = entry_tokens[left_bound:right_bound]
+        context = " ".join(context)
 
     return context
 
