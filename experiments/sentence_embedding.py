@@ -57,7 +57,6 @@ def main() -> None:
         model = AutoModel.from_pretrained(MODEL_NAME)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     df = pd.read_csv(data_file)
-
     emb = []
     lbl = []
     with torch.no_grad():
@@ -91,15 +90,15 @@ def main() -> None:
 
     print("Macro Metrics")
     print("================")
-    print(f"precision_macro={precision_macro:.2f}")
-    print(f"recall_macro={recall_macro:.2f}")
-    print(f"fscore_macro={fscore_macro:.2f}")
+    print(f"{precision_macro=:.2f}")
+    print(f"{recall_macro=:.2f}")
+    print(f"{fscore_macro=:.2f}")
 
     print("\nWeighted Metrics")
     print("================")
-    print(f"precision_weighted={precision_weighted:.2f}")
-    print(f"recall_weighted={recall_weighted:.2f}")
-    print(f"fscore_weighted={fscore_weighted:.2f}")
+    print(f"{precision_weighted=:.2f}")
+    print(f"{recall_weighted=:.2f}")
+    print(f"{fscore_weighted=:.2f}")
 
 
 if __name__ == "__main__":
