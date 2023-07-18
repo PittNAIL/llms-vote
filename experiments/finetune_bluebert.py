@@ -108,7 +108,6 @@ def main() -> None:
     df = pd.read_csv(args.data)
     df_train, df_test = train_test_split(df, test_size=0.1, random_state=1234)
     training_args.output_dir = set_dir(args.data)
-    print(training_args.output_dir)
     train_dataset = Dataset.from_dict(df_train)
     test_dataset = Dataset.from_dict(df_test)
     dataset = datasets.DatasetDict({"train": train_dataset, "test": test_dataset})
