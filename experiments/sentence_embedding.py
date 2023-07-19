@@ -18,9 +18,7 @@ from transformers import set_seed
 set_seed(1234)
 
 MODEL_NAME: str = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
-#experiments_dir = os.path.abspath(os.path.dirname(__file__))
 experiments_dir = pathlib.Path().absolute()
-#CONFIG_FILE_PATH = os.path.join(experiments_dir, "config.json")
 CONFIG_FILE_PATH = pathlib.PurePath.joinpath(experiments_dir, "config.json")
 
 def parse_args() -> argparse.Namespace:
