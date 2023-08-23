@@ -21,6 +21,7 @@ MODEL_NAME: str = "bionlp/bluebert_pubmed_mimic_uncased_L-12_H-768_A-12"
 experiments_dir = pathlib.Path().absolute()
 CONFIG_FILE_PATH = pathlib.PurePath.joinpath(experiments_dir, "config.json")
 
+
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
 
@@ -51,15 +52,15 @@ def main() -> None:
     if finetune_flag:
         model_path = get_model_path(data_file)
         model_dir = pathlib.PurePath.joinpath(experiments_dir, model_path)
-#        model_dir = os.path.join(experiments_dir, model_path)
+        #        model_dir = os.path.join(experiments_dir, model_path)
         shutil.copy(CONFIG_FILE_PATH, model_dir)
         model = AutoModel.from_pretrained(model_dir)
     else:
         model = AutoModel.from_pretrained(MODEL_NAME)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     df = pd.read_csv(data_file)
-    df1 = df[df['label'] ==1].head(100)
-    df0 = df[df['label'] == 0].head(100)
+    df1 = df[df["label"] == 1].head(100)
+    df0 = df[df["label"] == 0].head(100)
     df = pd.concat([df1, df0])
     emb = []
     lbl = []
