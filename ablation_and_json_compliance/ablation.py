@@ -8,28 +8,28 @@ plt.style.use("ggplot")
 
 IDENTIFICATION_DATA: dict[str, dict[str, tuple[float, float, float, float]]] = {
     "Accuracy": {
-        "LLaMA2": (0.60, 0.61, 0.60, 0.62),
+        "LLaMA 2": (0.60, 0.61, 0.60, 0.62),
         "MedAlpaca": (0.66, 0.73, 0.63, 0.68),
         "Stable Platypus 2": (0.60, 0.61, 0.60, 0.65),
         "Vicuna": (0.63, 0.67, 0.62, 0.62),
         "Models-Vote Prompting": (0.66, 0.70, 0.62, 0.68),
     },
     "Precision": {
-        "LLaMA2": (0.64, 0.65, 0.64, 0.68),
+        "LLaMA 2": (0.64, 0.65, 0.64, 0.68),
         "MedAlpaca": (0.66, 0.74, 0.63, 0.67),
         "Stable Platypus 2": (0.62, 0.63, 0.63, 0.69),
         "Vicuna": (0.63, 0.67, 0.62, 0.63),
         "Models-Vote Prompting": (0.66, 0.72, 0.62, 0.67),
     },
     "Recall": {
-        "LLaMA2": (0.61, 0.63, 0.61, 0.64),
+        "LLaMA 2": (0.61, 0.63, 0.61, 0.64),
         "MedAlpaca": (0.65, 0.72, 0.62, 0.67),
         "Stable Platypus 2": (0.61, 0.62, 0.61, 0.66),
         "Vicuna": (0.63, 0.66, 0.62, 0.63),
         "Models-Vote Prompting": (0.65, 0.69, 0.61, 0.67),
     },
     "F Score": {
-        "LLaMA2": (0.58, 0.60, 0.58, 0.60),
+        "LLaMA 2": (0.58, 0.60, 0.58, 0.60),
         "MedAlpaca": (0.65, 0.72, 0.62, 0.67),
         "Stable Platypus 2": (0.59, 0.61, 0.59, 0.64),
         "Vicuna": (0.63, 0.66, 0.62, 0.62),
@@ -39,28 +39,28 @@ IDENTIFICATION_DATA: dict[str, dict[str, tuple[float, float, float, float]]] = {
 
 CLASSIFICATION_DATA: dict[str, dict[str, tuple[float, float, float, float]]] = {
     "Accuracy": {
-        "LLaMA2": (0.71, 0.72, 0.65, 0.51),
+        "LLaMA 2": (0.71, 0.72, 0.65, 0.51),
         "MedAlpaca": (0.81, 0.81, 0.74, 0.63),
         "Stable Platypus 2": (0.70, 0.73, 0.65, 0.50),
         "Vicuna": (0.71, 0.70, 0.66, 0.56),
         "Models-Vote Prompting": (0.80, 0.81, 0.75, 0.61),
     },
     "Precision": {
-        "LLaMA2": (0.71, 0.72, 0.71, 0.67),
+        "LLaMA 2": (0.71, 0.72, 0.71, 0.67),
         "MedAlpaca": (0.77, 0.77, 0.78, 0.75),
         "Stable Platypus 2": (0.71, 0.72, 0.71, 0.68),
         "Vicuna": (0.72, 0.72, 0.72, 0.70),
         "Models-Vote Prompting": (0.76, 0.75, 0.77, 0.73),
     },
     "Recall": {
-        "LLaMA2": (0.57, 0.58, 0.52, 0.41),
+        "LLaMA 2": (0.57, 0.58, 0.52, 0.41),
         "MedAlpaca": (0.65, 0.65, 0.59, 0.51),
         "Stable Platypus 2": (0.56, 0.58, 0.52, 0.40),
         "Vicuna": (0.57, 0.56, 0.53, 0.45),
         "Models-Vote Prompting": (0.64, 0.65, 0.60, 0.49),
     },
     "F Score": {
-        "LLaMA2": (0.61, 0.62, 0.57, 0.46),
+        "LLaMA 2": (0.61, 0.62, 0.57, 0.46),
         "MedAlpaca": (0.70, 0.70, 0.67, 0.59),
         "Stable Platypus 2": (0.61, 0.63, 0.57, 0.46),
         "Vicuna": (0.63, 0.61, 0.59, 0.51),

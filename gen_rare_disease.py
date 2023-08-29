@@ -29,7 +29,7 @@ SELECT ?clsLabel WHERE {
 def parse_args() -> argparse.Namespace:
     """Parses the command line arguments."""
 
-    parser = argparse.ArgumentParser("Pretrained SNN Benchmarking")
+    parser = argparse.ArgumentParser("Rare Diseases: List Generation")
 
     parser.add_argument("--ordo", type=str, help="path to the ORDO ontology file", required=True)
     parser.add_argument("--out", type=str, help="path to write the file", required=True)

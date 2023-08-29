@@ -1,3 +1,9 @@
+# llms-vote
+
+Code for the Paper "Large Language Models Vote: Prompting for Rare Disease Identification"
+
+The pre-print is available on [arXiv](https://arxiv.org/abs/2308.12890)
+
 ## Environment
 
 ```console
@@ -9,7 +15,7 @@ $ pip install -r requirements.txt
 
 ## Generating a List of Rare Diseases
 
-Run the following to generate a list of rare diseases using [ORDO ontology][ordo]:
+Run the following to generate a list of rare diseases using [ORDO ontology][ordo] version 4.2:
 
 ```console
 $ mkdir data
