@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-plt.style.use("ggplot")
+plt.style.use("tableau-colorblind10")
 
 
 IDENTIFICATION_DATA: dict[str, dict[str, tuple[float, float, float, float]]] = {
