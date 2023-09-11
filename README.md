@@ -23,3 +23,15 @@ $ ./gen_rare_disease.py --ordo data/ORDO_en_4.2.owl --out data/rare_disease.txt
 ```
 
 [ordo]: https://www.orphadata.com/ordo/
+
+## Implementation
+
+[llms-vote][llms-vote] has been implemented by [David Oniani][david] and Jordan Hilsman.
+
+## License
+
+[MIT License][license]
+
+[david]: https://oniani.ai
+[license]: LICENSE
+[llms-vote]: https://github.com/oniani/llms-vote
