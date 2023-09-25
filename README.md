@@ -22,7 +22,14 @@ $ mkdir data
 $ ./gen_rare_disease.py --ordo data/ORDO_en_4.2.owl --out data/rare_disease.txt
 ```
 
-[ordo]: https://www.orphadata.com/ordo/
+## Generating Inverted Index
+
+Get [MIMIC-IV][mimic-iv] first. Then [install Rust][rust] and run the following:
+
+```console
+$ cd inverted_index
+$ cargo run --release -- ../data/rare_disease.txt ../data/discharge.csv ../data/inverted_index.json
+```
 
 ## Implementation
 
@@ -35,3 +42,6 @@ $ ./gen_rare_disease.py --ordo data/ORDO_en_4.2.owl --out data/rare_disease.txt
 [david]: https://oniani.ai
 [license]: LICENSE
 [llms-vote]: https://github.com/oniani/llms-vote
+[mimic-iv]: https://physionet.org/content/mimiciv/2.2/
+[ordo]: https://www.orphadata.com/ordo/
+[rust]: https://www.rust-lang.org/tools/install
