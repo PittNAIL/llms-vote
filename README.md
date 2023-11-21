@@ -35,12 +35,7 @@ $ cargo run --release -- ../data/rare_disease.txt ../data/discharge.csv ../data/
 
 [llms-vote][llms-vote] has been implemented by [David Oniani][david] and Jordan Hilsman.
 
-## License
-
-[MIT License][license]
-
 [david]: https://oniani.ai
-[license]: LICENSE
 [llms-vote]: https://github.com/oniani/llms-vote
 [mimic-iv]: https://physionet.org/content/mimiciv/2.2/
 [ordo]: https://www.orphadata.com/ordo/
