@@ -2,15 +2,15 @@
 
 Code for the Paper "Large Language Models Vote: Prompting for Rare Disease Identification"
 
-The pre-print is available on [arXiv](https://arxiv.org/abs/2308.12890)
+The preprint is available on [arXiv](https://arxiv.org/abs/2308.12890)
 
 ## Environment
 
 ```console
-$ python -m venv .venv
-$ source .venv/bin/activate
-$ pip install --upgrade pip
-$ pip install -r requirements.txt
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
 ```
 
 ## Generating a List of Rare Diseases
@@ -18,8 +18,8 @@ $ pip install -r requirements.txt
 Run the following to generate a list of rare diseases using [ORDO ontology][ordo] version 4.2:
 
 ```console
-$ mkdir data
-$ ./gen_rare_disease.py --ordo data/ORDO_en_4.2.owl --out data/rare_disease.txt
+mkdir data
+./gen_rare_disease.py --ordo data/ORDO_en_4.2.owl --out data/rare_disease.txt
 ```
 
 ## Generating Inverted Index
@@ -27,8 +27,8 @@ $ ./gen_rare_disease.py --ordo data/ORDO_en_4.2.owl --out data/rare_disease.txt
 Get [MIMIC-IV][mimic-iv] first. Then [install Rust][rust] and run the following:
 
 ```console
-$ cd inverted_index
-$ cargo run --release -- ../data/rare_disease.txt ../data/discharge.csv ../data/inverted_index.json
+cd inverted_index
+cargo run --release -- ../data/rare_disease.txt ../data/discharge.csv ../data/inverted_index.json
 ```
 
 ## Implementation
