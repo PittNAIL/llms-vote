@@ -13,7 +13,9 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## Generating a List of Rare Diseases
+## Reproducing the Dataset
+
+### Generating a List of Rare Diseases
 
 Run the following to generate a list of rare diseases using [ORDO ontology][ordo] version 4.2:
 
@@ -22,7 +24,7 @@ mkdir data
 ./gen_rare_disease.py --ordo data/ORDO_en_4.2.owl --out data/rare_disease.txt
 ```
 
-## Generating Inverted Index
+### Generating Inverted Index
 
 Get [MIMIC-IV][mimic-iv] first. Then [install Rust][rust] and run the following:
 
